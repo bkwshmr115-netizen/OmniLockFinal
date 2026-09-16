@@ -1,0 +1,40 @@
+name: Build OmniLock APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Install dependencies
+      run: |
+        npm install
+        cordova platform add android || true
+
+    - name: Build APK
+      run: cordova build android --release || cordova build android
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Official-App-APK
+        path: platforms/android/app/build/outputs/apk/**/*.apk
