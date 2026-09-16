@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
     - name: Set up Java
       uses: actions/setup-java@v4
@@ -21,20 +26,24 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        packages: 'tools platform-tools platforms;android-34 build-tools;34.0.0'
 
     - name: Install Cordova
       run: npm install -g cordova
 
-    - name: Install dependencies
+    - name: Prepare project
       run: |
-        npm install
-        cordova platform add android || true
+        npm install || true
+        cordova platform rm android || true
+        cordova platform add android
 
-    - name: Build APK
-      run: cordova build android --release || cordova build android
+    - name: Build Debug APK
+      run: cordova build android
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: Official-App-APK
-        path: platforms/android/app/build/outputs/apk/**/*.apk
+        path: platforms/android/app/build/outputs/apk/debug/*.apk
+        if-no-files-found: warn
