@@ -36,7 +36,7 @@ jobs:
 
     - name: Prepare and Build Android
       run: |
-        cordova platform add android || cordova platform rm android && cordova platform add android
+        cordova platform add android --nosave || true
         cordova build android --device --debug
 
     - name: Upload Finished APK
